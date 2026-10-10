@@ -26,7 +26,7 @@
 
 * **1. Zeek (Zeek Network Security Monitor):**
   * **หน้าที่:** เป็นเครื่องมือดักฟังเครือข่ายเชิงรับ (Passive Security Monitor) คอยถอดรหัสและวิเคราะห์โปรโตคอลอุตสาหกรรม (เช่น Modbus, S7comm) เพื่อทำ Asset Discovery โดยไม่ส่งแพ็กเกจรบกวนเครื่องจักรในสายการผลิต
-* **2. NAC Controller (`nac_script.py`):**
+* **2. NAC Controller ([`nac_script.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-02-nac/nac_script.py)):**
   * **หน้าที่:** จำลองระบบ Network Access Control คอยมอนิเตอร์ Docker Socket API ตรวจสอบค่า MAC Address OUI ของอุปกรณ์ใหม่ แล้วทำ Dynamic Segmentation ย้ายวง VLAN ให้อัตโนมัติ
 * **3. Conpot Honeypot (`plc-siemens`):**
   * **หน้าที่:** จำลองเป็นเครื่อง PLC Siemens S7-300 ในโซนการผลิต (Purdue Level 1) กำหนดค่า MAC Address OUI เป็น `00:0e:8c` เพื่อใช้ทดสอบการจำแนกอุปกรณ์ (Device Profiling)
@@ -61,7 +61,7 @@ docker rm -f plc-siemens kali-attacker nac-controller zeek-sensor 2>/dev/null ||
 #### 📁 สิ่งที่ต้องจัดเตรียม (Files Needed)
 สร้างโฟลเดอร์ชื่อ `ot-security-lab` (หรือใช้โฟลเดอร์โปรเจกต์ปัจจุบัน) และตรวจสอบไฟล์ 2 ไฟล์ต่อไปนี้:
 
-##### ไฟล์ที่ 1: `docker-compose.yml`
+##### ไฟล์ที่ 1: [`docker-compose.yml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-02-nac/docker-compose.yml)
 ```yaml
 version: '3.8'
 
@@ -117,7 +117,7 @@ services:
     command: tail -f /dev/null
 ```
 
-##### ไฟล์ที่ 2: `nac_script.py`
+##### ไฟล์ที่ 2: [`nac_script.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-02-nac/nac_script.py)
 ```python
 import docker
 import time

@@ -23,11 +23,11 @@
 
 #### 🛠️ เครื่องมือที่ใช้ในปฏิบัติการ (Tools & Environment Overview)
 
-* **1. PAM Gateway (`ot-pam-gateway / pam_gateway.py`):**
+* **1. PAM Gateway (`ot-pam-gateway` / [`pam_gateway.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-04-pam-remote-access/pam_gateway.py)):**
   * **หน้าที่:** ประตูกลางควบคุมการเข้าถึงสิทธิ์สูง (Privileged Access Management) ทำหน้าที่ซ่อนรหัสผ่านจริง (Credential Vault), ตรวจสอบสิทธิ์ด้วย Token, คัดกรองคำสั่งอันตราย (Command Blacklist) และบันทึก Audit Logs ลงไฟล์ `session_audit.log`
 * **2. PLC SCADA Target (`plc-scada`):**
   * **หน้าที่:** จำลองเป็นเครื่องจักรหรือสมองกล PLC ในโซนควบคุมการผลิต (Purdue Level 1-2) ที่ต้องการความคุ้มครองจากการรีโมทโดยตรง
-* **3. External Vendor Client (`kali-vendor / vendor_client.py`):**
+* **3. External Vendor Client (`kali-vendor` / [`vendor_client.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-04-pam-remote-access/vendor_client.py)):**
   * **หน้าที่:** จำลองเป็นคอมพิวเตอร์พกพาของผู้รับเหมาภายนอก (Vendor Laptop) ใช้งานสคริปต์ `vendor_client.py` เพื่อเชื่อมต่อผ่าน PAM Gateway
 * **4. Docker Bridge Networks (Virtual VLANs):**
   * **`external-vendor-net` (VLAN 10 / 172.21.0.0/16):** โซนภายนอกโรงงานสำหรับผู้รับเหมาภายนอก
@@ -57,7 +57,7 @@ docker rm -f ot-pam-gateway plc-scada kali-vendor 2>/dev/null || true
 #### 📁 สิ่งที่ต้องจัดเตรียม (Files Needed)
 ตรวจสอบไฟล์ 3 ไฟล์หลักภายในโฟลเดอร์ปฏิบัติการ `module-04-pam-remote-access`:
 
-##### ไฟล์ที่ 1: `docker-compose.yml`
+##### ไฟล์ที่ 1: [`docker-compose.yml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-04-pam-remote-access/docker-compose.yml)
 ```yaml
 version: '3.8'
 
@@ -113,7 +113,7 @@ services:
     command: tail -f /dev/null
 ```
 
-##### ไฟล์ที่ 2: `pam_gateway.py`
+##### ไฟล์ที่ 2: [`pam_gateway.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-04-pam-remote-access/pam_gateway.py)
 ```python
 import socket
 import threading
@@ -189,7 +189,7 @@ if __name__ == "__main__":
     main()
 ```
 
-##### ไฟล์ที่ 3: `vendor_client.py`
+##### ไฟล์ที่ 3: [`vendor_client.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-04-pam-remote-access/vendor_client.py)
 ```python
 import socket
 import sys

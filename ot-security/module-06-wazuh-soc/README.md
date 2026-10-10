@@ -23,18 +23,18 @@
 
 #### 🛠️ เครื่องมือที่ใช้ในปฏิบัติการ (Tools & Environment Overview)
 
-* **1. Wazuh Manager SIEM & SOAR Engine (`wazuh-manager` - IP: 172.20.0.100):**
-  * **หน้าที่:** ระบบศูนย์กลางเฝ้าระวังภัยคุกคาม รวบรวม Syslog (UDP 514), ประมวลผลกฎ Custom XML Rules (`local_rules.xml`) และสั่งการระบบตอบสนองอัตโนมัติ (SOAR) ผ่านสคริปต์ `ot-block.sh`
-* **2. Wazuh Custom XML Rules (`rules/local_rules.xml`):**
+* **1. Wazuh Manager SIEM & SOAR Engine (`wazuh-manager` / [`wazuh_sim.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/wazuh_sim.py) - IP: 172.20.0.100):**
+  * **หน้าที่:** ระบบศูนย์กลางเฝ้าระวังภัยคุกคาม รวบรวม Syslog (UDP 514), ประมวลผลกฎ Custom XML Rules ([`local_rules.xml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/rules/local_rules.xml)) และสั่งการระบบตอบสนองอัตโนมัติ (SOAR) ผ่านสคริปต์ [`ot-block.sh`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/active-response/bin/ot-block.sh)
+* **2. Wazuh Custom XML Rules ([`rules/local_rules.xml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/rules/local_rules.xml)):**
   * **หน้าที่:** ชุดกฎตรวจจับภัยคุกคามเฉพาะทาง OT แบ่งเป็น:
     * **Rule 100001 (Level 8):** ตรวจจับคำสั่ง Modbus Write
     * **Rule 100002 (Level 12):** ตรวจจับการแตะต้อง Decoy Asset
     * **Rule 100003 (Level 14):** ตรวจจับการยิง Firmware Exploit (FC: 90)
-* **3. Active Response Script (`active-response/bin/ot-block.sh`):**
+* **3. Active Response Script ([`active-response/bin/ot-block.sh`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/active-response/bin/ot-block.sh)):**
   * **หน้าที่:** สคริปต์ตอบสนองอัตโนมัติ ทำหน้าที่สั่งบล็อก IP ของแฮกเกอร์ (`172.20.0.50`) ทันทีที่ทริกเกอร์ Rule ระดับ 12 ขึ้นไป พร้อมบันทึกหลักฐานลง `/var/ossec/logs/active-responses.log`
-* **4. OT Log Generator (`ot-log-sender` / `ot_log_generator.py` - IP: 172.20.0.10):**
+* **4. OT Log Generator (`ot-log-sender` / [`ot_log_generator.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/ot_log_generator.py) - IP: 172.20.0.10):**
   * **หน้าที่:** จำลองเซ็นเซอร์และอุปกรณ์ในสายการผลิตที่ทำการส่ง Syslog (RFC3164) เข้าสู่ Wazuh SIEM
-* **5. Attacker Simulator (`kali-attacker` / `attack_sim.py` - IP: 172.20.0.50):**
+* **5. Attacker Simulator (`kali-attacker` / [`attack_sim.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/attack_sim.py) - IP: 172.20.0.50):**
   * **หน้าที่:** จำลองเครื่องของผู้บุกรุก ใช้งานสคริปต์ `attack_sim.py` ยิงเหตุการณ์การโจมตีรูปแบบต่างๆ เข้าหา Wazuh SIEM
 
 ---
@@ -65,7 +65,7 @@ docker rm -f wazuh-manager ot-log-sender kali-attacker 2>/dev/null || true
 mkdir -p rules active-response/bin
 ```
 
-##### ไฟล์ที่ 1: `docker-compose.yml`
+##### ไฟล์ที่ 1: [`docker-compose.yml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/docker-compose.yml)
 ```yaml
 version: '3.8'
 
@@ -126,7 +126,7 @@ services:
         ipv4_address: 172.20.0.50
 ```
 
-##### ไฟล์ที่ 2: `rules/local_rules.xml`
+##### ไฟล์ที่ 2: [`rules/local_rules.xml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/rules/local_rules.xml)
 ```xml
 <group name="ot,industrial_security,">
 
@@ -157,7 +157,7 @@ services:
 </group>
 ```
 
-##### ไฟล์ที่ 3: `active-response/bin/ot-block.sh`
+##### ไฟล์ที่ 3: [`active-response/bin/ot-block.sh`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/active-response/bin/ot-block.sh)
 ```bash
 #!/bin/bash
 # Wazuh Active Response script for OT Automated Threat Blocking
@@ -177,7 +177,7 @@ echo "[$TIMESTAMP] [⚡ WAZUH ACTIVE RESPONSE EXECUTED] Blocked IP $ATTACKER_IP 
 echo "[$TIMESTAMP] Active Response Executed: Blocked IP $ATTACKER_IP" >> "$LOG_FILE"
 ```
 
-##### ไฟล์ที่ 4: `ot_log_generator.py`
+##### ไฟล์ที่ 4: [`ot_log_generator.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/ot_log_generator.py)
 ```python
 import socket
 import time
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     main()
 ```
 
-##### ไฟล์ที่ 5: `attack_sim.py`
+##### ไฟล์ที่ 5: [`attack_sim.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-06-wazuh-soc/attack_sim.py)
 ```python
 import socket
 import time

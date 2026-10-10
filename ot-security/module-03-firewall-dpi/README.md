@@ -25,11 +25,11 @@
 
 #### 🛠️ เครื่องมือที่ใช้ในปฏิบัติการ (Tools & Environment Overview)
 
-* **1. Next-Gen Firewall & IPS Engine (`ot-firewall / firewall_dpi.py`):**
+* **1. Next-Gen Firewall & IPS Engine (`ot-firewall` / [`firewall_dpi.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-03-firewall-dpi/firewall_dpi.py)):**
   * **หน้าที่:** ทำหน้าที่เป็น Industrial Firewall และระบบป้องกันการบุกรุก (IPS) อยู่ในตำแหน่ง Conduit คอยแกะพัสดุข้อมูลลึกถึงระดับ Application Layer (Layer 7) ตรวจสอบ Function Code ของ Modbus TCP และบล็อกคำสั่งอันตรายแบบเรียลไทม์
 * **2. Siemens S7 PLC Honeypot (`plc-siemens`):**
   * **หน้าที่:** จำลองเป็นสมองกลควบคุมเครื่องจักร Siemens S7 PLC ในโซนปลอดภัย (Purdue Level 1) ทำหน้าที่รับคำสั่ง Modbus TCP (Port 5020/502)
-* **3. Vendor / Attacker Node (`kali-attacker / send_modbus.py`):**
+* **3. Vendor / Attacker Node (`kali-attacker` / [`send_modbus.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-03-firewall-dpi/send_modbus.py)):**
   * **หน้าที่:** จำลองเป็นคอมพิวเตอร์พกพาของผู้รับเหมาหรือผู้บุกรุก ใช้งานสคริปต์ `send_modbus.py` เพื่อส่งแพ็กเกจ Modbus TCP Read (FC: 03), Write (FC: 06) หรือ Exploit Payload (FC: 90) เข้าหา Firewall
 * **4. Docker Bridge Networks (Zones & Conduits):**
   * **`untrusted-net` (VLAN 10 / 172.19.0.0/16):** โซนเครือข่ายภายนอก หรือ IT/Vendor Zone ที่ไม่ปลอดภัย
@@ -59,7 +59,7 @@ docker rm -f ot-firewall plc-siemens kali-attacker 2>/dev/null || true
 #### 📁 สิ่งที่ต้องจัดเตรียม (Files Needed)
 ตรวจสอบไฟล์ 3 ไฟล์หลักภายในโฟลเดอร์ปฏิบัติการ `module-03-firewall-dpi`:
 
-##### ไฟล์ที่ 1: `docker-compose.yml`
+##### ไฟล์ที่ 1: [`docker-compose.yml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-03-firewall-dpi/docker-compose.yml)
 ```yaml
 version: '3.8'
 
@@ -115,7 +115,7 @@ services:
     command: tail -f /dev/null
 ```
 
-##### ไฟล์ที่ 2: `firewall_dpi.py`
+##### ไฟล์ที่ 2: [`firewall_dpi.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-03-firewall-dpi/firewall_dpi.py)
 ```python
 import socket
 import threading
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     main()
 ```
 
-##### ไฟล์ที่ 3: `send_modbus.py`
+##### ไฟล์ที่ 3: [`send_modbus.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-03-firewall-dpi/send_modbus.py)
 ```python
 import socket
 import sys

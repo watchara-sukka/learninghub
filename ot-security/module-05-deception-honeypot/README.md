@@ -27,9 +27,9 @@
   * **หน้าที่:** สมองกล PLC จริงในสายการผลิต รันโปรโตคอล Modbus TCP ซึ่งต้องได้รับการปกป้องสูงสุดจากการเข้าถึงโดยมิชอบ
 * **2. Decoy / Honeypot Fake PLC (`plc-decoy` - IP: 172.20.0.99):**
   * **หน้าที่:** เครื่องจักรจำลอง (Conpot / Fake PLC) ที่ถูกวางล่อไว้ในวงเครือข่ายเดียวกัน โดยปรับแต่งค่า Profile ให้เหมือน PLC Siemens S7-300 ทุกประการเพื่อดึงดูดผู้บุกรุก
-* **3. Deception Security Monitor (`deception-monitor` / `ot_deception_sensor.py` - IP: 172.20.0.100):**
+* **3. Deception Security Monitor (`deception-monitor` / [`ot_deception_sensor.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-05-deception-honeypot/ot_deception_sensor.py) - IP: 172.20.0.100):**
   * **หน้าที่:** ระบบเซ็นเซอร์มอนิเตอร์เฝ้าระวัง คอยตรวจสอบทราฟฟิกเข้าหา `plc-decoy` และสร้างการแจ้งเตือนแบบเรียลไทม์ (Near-Zero False Positive Alert) พร้อมบันทึกไฟล์ `deception_alerts.log`
-* **4. Attacker Node (`kali-attacker` / `attacker_scan.py` - IP: 172.20.0.50):**
+* **4. Attacker Node (`kali-attacker` / [`attacker_scan.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-05-deception-honeypot/attacker_scan.py) - IP: 172.20.0.50):**
   * **หน้าที่:** จำลองเป็นโน้ตบุ๊กของผู้บุกรุกที่หลุดเข้ามาในวงการผลิต ใช้งานสคริปต์ `attacker_scan.py` เพื่อสแกนค้นหาพอร์ต Modbus และส่งคำสั่งโจมตี
 
 ---
@@ -56,7 +56,7 @@ docker rm -f plc-real plc-decoy deception-monitor kali-attacker 2>/dev/null || t
 #### 📁 สิ่งที่ต้องจัดเตรียม (Files Needed)
 ตรวจสอบไฟล์ 3 ไฟล์หลักภายในโฟลเดอร์ปฏิบัติการ `module-05-deception-honeypot`:
 
-##### ไฟล์ที่ 1: `docker-compose.yml`
+##### ไฟล์ที่ 1: [`docker-compose.yml`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-05-deception-honeypot/docker-compose.yml)
 ```yaml
 version: '3.8'
 
@@ -113,7 +113,7 @@ services:
         ipv4_address: 172.20.0.50
 ```
 
-##### ไฟล์ที่ 2: `ot_deception_sensor.py`
+##### ไฟล์ที่ 2: [`ot_deception_sensor.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-05-deception-honeypot/ot_deception_sensor.py)
 ```python
 import socket
 import threading
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     simulate_deception_trap_listener()
 ```
 
-##### ไฟล์ที่ 3: `attacker_scan.py`
+##### ไฟล์ที่ 3: [`attacker_scan.py`](https://github.com/watchara-sukka/learninghub/blob/main/ot-security/module-05-deception-honeypot/attacker_scan.py)
 ```python
 import socket
 import sys
