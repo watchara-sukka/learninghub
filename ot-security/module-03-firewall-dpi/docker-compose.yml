@@ -1,0 +1,52 @@
+version: '3.8'
+
+networks:
+  untrusted-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
+  production-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+services:
+  # 1. ระบบควบคุมจำลอง Next-Generation Firewall (NGFW/IPS Engine)
+  ot-firewall:
+    image: python:3.10-slim
+    container_name: ot-firewall
+    volumes:
+      - ./firewall_dpi.py:/app/firewall_dpi.py
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: python firewall_dpi.py block-write enable-ips
+    networks:
+      untrusted-net:
+        ipv4_address: 172.19.0.10
+      production-net:
+        ipv4_address: 172.20.0.10
+
+  # 2. เครื่องจักรเป้าหมายในโซนปลอดภัย (Siemens PLC จำลองผ่าน Conpot)
+  plc-siemens:
+    image: honeynet/conpot
+    container_name: plc-siemens
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.20
+
+  # 3. โน้ตบุ๊กของผู้รับเหมาหรือแฮกเกอร์ (จำลองผ่าน Python environment)
+  kali-attacker:
+    image: python:3.10-slim
+    container_name: kali-attacker
+    volumes:
+      - ./send_modbus.py:/app/send_modbus.py
+    working_dir: /app
+    networks:
+      untrusted-net:
+        ipv4_address: 172.19.0.50
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null

@@ -1,0 +1,53 @@
+version: '3.8'
+
+networks:
+  production-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+services:
+  # 1. เครื่อง PLC จริงในสายการผลิต (Real Production Asset)
+  plc-real:
+    image: honeynet/conpot
+    container_name: plc-real
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.20
+
+  # 2. อุปกรณ์เหยื่อล่อ (Decoy / Honeypot Fake PLC Asset)
+  plc-decoy:
+    image: honeynet/conpot
+    container_name: plc-decoy
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.99
+
+  # 3. เซ็นเซอร์ตรวจจับการแตะต้องเหยื่อล่อ (Deception Monitor & Alert Engine)
+  deception-monitor:
+    image: python:3.10-slim
+    container_name: deception-monitor
+    volumes:
+      - ./ot_deception_sensor.py:/app/ot_deception_sensor.py
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: python ot_deception_sensor.py
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.100
+
+  # 4. โน้ตบุ๊กของผู้บุกรุก (Kali Linux Attacker / Python environment)
+  kali-attacker:
+    image: python:3.10-slim
+    container_name: kali-attacker
+    volumes:
+      - ./attacker_scan.py:/app/attacker_scan.py
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.50

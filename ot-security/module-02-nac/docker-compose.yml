@@ -1,0 +1,52 @@
+version: '3.8'
+
+networks:
+  ingress-net:
+    driver: bridge
+  production-net:
+    driver: bridge
+  quarantine-net:
+    driver: bridge
+
+services:
+  # 1. ระบบควบคุม NAC (จำลอง Gateway Switch Controller)
+  nac-controller:
+    image: python:3.10-slim
+    container_name: nac-controller
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./nac_script.py:/app/nac_script.py
+    working_dir: /app
+    command: sh -c "pip install docker && python nac_script.py"
+    networks:
+      - ingress-net
+      - production-net
+      - quarantine-net
+
+  # 2. เครื่องจักรจำลอง (Siemens S7 PLC ปลอมตัวผ่าน Conpot Honeypot)
+  plc-siemens:
+    image: honeynet/conpot
+    container_name: plc-siemens
+    mac_address: "00:0e:8c:aa:bb:cc" # Siemens OUI
+    networks:
+      - ingress-net
+
+  # 3. เซ็นเซอร์ตรวจสอบทราฟฟิกอุตสาหกรรม (Lightweight Zeek)
+  zeek-sensor:
+    image: blacktop/zeek
+    container_name: zeek-sensor
+    network_mode: "service:plc-siemens" # ผูกอินเตอร์เฟสเพื่อดักฟังทราฟฟิกของ PLC แบบ Passive
+    tty: true
+    stdin_open: true
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+  # 4. โน้ตบุ๊กของผู้รับเหมา/ผู้บุกรุก (จำลองผ่าน Alpine Linux ที่มีคำสั่ง ping ในตัว)
+  kali-attacker:
+    image: alpine
+    container_name: kali-attacker
+    mac_address: "02:42:ac:11:00:02" # MAC ทั่วไป
+    networks:
+      - ingress-net
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null

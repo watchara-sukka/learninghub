@@ -1,0 +1,27 @@
+<group name="ot,industrial_security,">
+
+  <!-- Rule 1: ตรวจจับการพยายามเขียนสั่งการ PLC (Modbus Write) -->
+  <rule id="100001" level="8">
+    <field name="message">Modbus WRITE Command</field>
+    <description>OT Warning: Unauthorized Modbus WRITE command detected targeting PLC!</description>
+    <mitre>
+      <id>T0855</id> <!-- MITRE ATT&CK for ICS: Unauthorized Command Message -->
+    </mitre>
+  </rule>
+
+  <!-- Rule 2: ตรวจจับการแตะต้องเครื่องเหยื่อล่อ (Decoy Asset Access) -->
+  <rule id="100002" level="12">
+    <field name="message">DECOY_PLC_TOUCHED</field>
+    <description>CRITICAL OT ALERT: Intruder interacting with Decoy PLC Asset (172.20.0.99)!</description>
+    <mitre>
+      <id>T0846</id> <!-- MITRE ATT&CK for ICS: Remote System Discovery -->
+    </mitre>
+  </rule>
+
+  <!-- Rule 3: ตรวจจับการยิง Exploit ช่องโหว่สมองกล (Firmware Exploit FC 90) -->
+  <rule id="100003" level="14">
+    <field name="message">EXPLOIT_FC90_DETECTED</field>
+    <description>CRITICAL OT ALERT: Modbus Firmware Exploit Payload (FC: 90) intercepted!</description>
+  </rule>
+
+</group>

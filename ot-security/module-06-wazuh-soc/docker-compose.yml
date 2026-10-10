@@ -1,0 +1,57 @@
+version: '3.8'
+
+networks:
+  production-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+services:
+  # 1. Wazuh Manager & SIEM Engine (จำลองระบบประมวลผล Log และ SOAR)
+  wazuh-manager:
+    image: python:3.10-slim
+    container_name: wazuh-manager
+    hostname: wazuh-manager
+    ports:
+      - "514:514/udp"   # Syslog Port สำหรับรับ Log จากอุปกรณ์ OT
+      - "55000:55000"   # Wazuh API Port
+    volumes:
+      - ./rules/local_rules.xml:/var/ossec/etc/rules/local_rules.xml:ro
+      - ./active-response/bin/ot-block.sh:/var/ossec/active-response/bin/ot-block.sh:ro
+      - ./wazuh_sim.py:/app/wazuh_sim.py
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: python wazuh_sim.py
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.100
+
+  # 2. เซ็นเซอร์และอุปกรณ์ส่ง Log ในเครือข่าย OT (OT Security Log Generators)
+  ot-log-sender:
+    image: python:3.10-slim
+    container_name: ot-log-sender
+    volumes:
+      - ./ot_log_generator.py:/app/ot_log_generator.py
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: python ot_log_generator.py
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.10
+
+  # 3. เครื่องผู้บุกรุก / แฮกเกอร์ (Kali Linux Attacker / Python environment)
+  kali-attacker:
+    image: python:3.10-slim
+    container_name: kali-attacker
+    volumes:
+      - ./attack_sim.py:/app/attack_sim.py
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null
+    networks:
+      production-net:
+        ipv4_address: 172.20.0.50

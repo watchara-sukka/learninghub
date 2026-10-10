@@ -1,0 +1,52 @@
+version: '3.8'
+
+networks:
+  external-vendor-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+  internal-production-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+
+services:
+  # 1. ประตูกลาง PAM (Privileged Access Management Gateway)
+  ot-pam-gateway:
+    image: python:3.10-slim
+    container_name: ot-pam-gateway
+    volumes:
+      - ./pam_gateway.py:/app/pam_gateway.py
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: python pam_gateway.py
+    networks:
+      external-vendor-net:
+        ipv4_address: 172.21.0.10
+      internal-production-net:
+        ipv4_address: 172.22.0.10
+
+  # 2. เครื่องจักรเป้าหมายในโซนการผลิต (PLC/SCADA Target)
+  plc-scada:
+    image: honeynet/conpot
+    container_name: plc-scada
+    networks:
+      internal-production-net:
+        ipv4_address: 172.22.0.20
+
+  # 3. โน้ตบุ๊กของผู้รับเหมาภายนอก (External Vendor / Python environment)
+  kali-vendor:
+    image: python:3.10-slim
+    container_name: kali-vendor
+    volumes:
+      - ./vendor_client.py:/app/vendor_client.py
+    working_dir: /app
+    networks:
+      external-vendor-net:
+        ipv4_address: 172.21.0.50
+    tty: true
+    stdin_open: true
+    command: tail -f /dev/null
